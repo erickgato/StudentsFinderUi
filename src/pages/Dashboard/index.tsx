@@ -1,6 +1,8 @@
 import React from "react";
-import { Box } from "@mui/system";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { useQuery, gql } from "@apollo/client";
+import { Box } from "@mui/system";
+import { CircularProgress } from "@material-ui/core";
 
 const students = [
   {
@@ -11,7 +13,23 @@ const students = [
   },
 ];
 
+
 export function Dashboard(): JSX.Element {
+  const { loading, data } = useQuery(gql`
+    query {
+      students {
+        id,
+        name,
+        document,
+        email,
+      }
+    }
+  `);
+
+  if(loading) {
+    return <CircularProgress />;
+  }
+  
   const columns: GridColDef[] = [
     {
       field: "name",
@@ -20,15 +38,15 @@ export function Dashboard(): JSX.Element {
     },
     {
       field: "email",
-      headerName: "Nome",
+      headerName: "Email",
       flex: 1,
     },
     {
       field: "document",
-      headerName: "Nome",
+      headerName: "CPF",
       flex: 1,
     },
   ];
 
-  return <DataGrid rows={students} columns={columns} />;
+  return <DataGrid rows={data.students} columns={columns} />;
 }
