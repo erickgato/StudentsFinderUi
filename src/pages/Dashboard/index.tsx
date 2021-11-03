@@ -10,6 +10,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import { useDebounce } from "../../hooks/useDebounce";
+import { GridLoadingSkeleton } from "../../components/organisms";
 
 type SearchField = "document" | "name" | "email";
 
@@ -26,23 +27,19 @@ export function Dashboard(): JSX.Element {
       }
     }
   `);
-  const searchStudents = useDebounce(getStudents, 500);
-
   React.useEffect(() => {
     getStudents();
   }, []);
+  const searchStudents = useDebounce(getStudents, 500);
+
 
   React.useEffect(() => {
-    if (searchField?.length === 0) {
-      return;
-    }
-
     searchStudents({
       variables: {
         [searchField as string]: searchValue,
       },
     });
-  }, [searchField, searchValue, searchStudents]);
+  }, [searchField, searchValue]);
 
   const columns: GridColDef[] = [
     {
@@ -61,7 +58,6 @@ export function Dashboard(): JSX.Element {
       flex: 1,
     },
   ];
-
 
   return (
     <Box
@@ -89,7 +85,12 @@ export function Dashboard(): JSX.Element {
           </Select>
         </Box>
       </Box>
-      <DataGrid rows={data?.students || []} columns={columns} />
+
+      {loading ? (
+        <GridLoadingSkeleton rowCount={3} />
+      ) : (
+        <DataGrid rows={data?.students || []} columns={columns} />
+      )}
     </Box>
   );
 }
