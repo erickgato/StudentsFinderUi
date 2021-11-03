@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@material-ui/core";
 import { useDebounce } from "../../hooks/useDebounce";
 import { GridLoadingSkeleton } from "../../components/organisms";
@@ -32,7 +33,6 @@ export function Dashboard(): JSX.Element {
   }, []);
   const searchStudents = useDebounce(getStudents, 500);
 
-
   React.useEffect(() => {
     searchStudents({
       variables: {
@@ -46,16 +46,22 @@ export function Dashboard(): JSX.Element {
       field: "name",
       headerName: "Nome",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "email",
       headerName: "Email",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "document",
       headerName: "CPF",
       flex: 1,
+      headerAlign: "center",
+      align: "center",
     },
   ];
 
@@ -64,8 +70,13 @@ export function Dashboard(): JSX.Element {
       display="flex"
       sx={{ width: "100%", height: "100%" }}
       flexDirection="column"
+      alignItems="center"
+      p={1}
     >
-      <Box display="flex" alignItems="center" p={4}>
+      <Box pl={2} pt={2}>
+        <Typography variant="h6">Alunos</Typography>
+      </Box>
+      <Box display="flex" alignItems="center" pb={4}>
         <TextField
           label="Buscar"
           variant="outlined"
