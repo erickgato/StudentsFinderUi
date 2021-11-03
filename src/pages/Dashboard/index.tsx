@@ -1,35 +1,49 @@
 import React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql, useLazyQuery } from "@apollo/client";
 import { Box } from "@mui/system";
-import { CircularProgress } from "@material-ui/core";
+import {
+  CircularProgress,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
+import { useDebounce } from "../../hooks/useDebounce";
 
-const students = [
-  {
-    id: 1,
-    name: "erick",
-    email: "erick@sample.com.br",
-    document: "000.000.000-00",
-  },
-];
-
+type SearchField = "document" | "name" | "email";
 
 export function Dashboard(): JSX.Element {
-  const { loading, data } = useQuery(gql`
-    query {
-      students {
-        id,
-        name,
-        document,
-        email,
+  const [searchValue, setSearchValue] = React.useState("");
+  const [searchField, setSearchField] = React.useState<SearchField>("name");
+  const [getStudents, { loading, data }] = useLazyQuery(gql`
+    query Student($name: String, $document: String, $email: String) {
+      students(name: $name, document: $document, email: $email) {
+        id
+        name
+        document
+        email
       }
     }
   `);
+  const searchStudents = useDebounce(getStudents, 500);
 
-  if(loading) {
-    return <CircularProgress />;
-  }
-  
+  React.useEffect(() => {
+    getStudents();
+  }, []);
+
+  React.useEffect(() => {
+    if (searchField?.length === 0) {
+      return;
+    }
+
+    searchStudents({
+      variables: {
+        [searchField as string]: searchValue,
+      },
+    });
+  }, [searchField, searchValue, searchStudents]);
+
   const columns: GridColDef[] = [
     {
       field: "name",
@@ -48,5 +62,34 @@ export function Dashboard(): JSX.Element {
     },
   ];
 
-  return <DataGrid rows={data.students} columns={columns} />;
+
+  return (
+    <Box
+      display="flex"
+      sx={{ width: "100%", height: "100%" }}
+      flexDirection="column"
+    >
+      <Box display="flex" alignItems="center" p={4}>
+        <TextField
+          label="Buscar"
+          variant="outlined"
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+
+        <Box pl={2}>
+          <InputLabel id="search-field">Campo</InputLabel>
+          <Select
+            labelId="search-field"
+            value={searchField}
+            onChange={(e) => setSearchField(e?.target?.value as SearchField)}
+          >
+            <MenuItem value={"name"}>Nome</MenuItem>
+            <MenuItem value={"document"}>Documento</MenuItem>
+            <MenuItem value={"email"}>Email</MenuItem>
+          </Select>
+        </Box>
+      </Box>
+      <DataGrid rows={data?.students || []} columns={columns} />
+    </Box>
+  );
 }
