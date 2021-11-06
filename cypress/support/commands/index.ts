@@ -9,5 +9,8 @@
 // ***********************************************
 import '@testing-library/cypress/add-commands';
 import './search';
-import './findAttribute';
 import './waitQuery';
+import './toggleSelect';
+import './getTableAttribute';
+import './selectField';
+import './validateSearchBehavior';

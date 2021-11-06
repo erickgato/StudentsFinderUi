@@ -1,6 +1,5 @@
 /* eslint-disable jest/valid-expect-in-promise */
-/// <reference types="Cypress" />
-/// <reference types="@testing-library/cypress" />
+/// <reference types="../support" />
 
 describe("Search page", () => {
 	beforeEach(() => {
@@ -8,24 +7,33 @@ describe("Search page", () => {
 	});
 
 	it('Has to filter by name', () => {
-		cy.findByTestId('names-1').then(([row]) => {
-			const name = row.innerHTML;
-			//@ts-ignore
-			cy.search(name);
-			// @ts-ignore
-			cy.waitQuery();
-			cy.findByTestId('names-1').invoke('text').should('be.equal', name);
+		cy.validateSearchBehavior({
+			field: 'name',
+			tableAttributes: {
+				name: 'names',
+				row: 1,
+			},
 		});
-
 	});
 
 	it('Has to filter by email', () => {
-		cy.findByTestId('emails-1').then(([row]) => {
-			const email = row.innerHTML;
+		cy.validateSearchBehavior({
+			field: 'email',
+			tableAttributes: {
+				name: 'emails',
+				row: 1,
+			},
+		});
+	});
 
-			cy.search(email);
-			cy.findByTestId('emails-1').invoke('text').should('be.equal', email\);
-		})
+	it('Has to filter by document', () => {
+		cy.validateSearchBehavior({
+			field: 'document',
+			tableAttributes: {
+				name: 'documents',
+				row: 1,
+			},
+		});
 	});
 	
 })

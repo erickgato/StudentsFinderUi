@@ -28,6 +28,7 @@ export function MultiSearchBar<Options extends Record<string, string>>({
           value={selectedOption}
           onChange={(e) => onOptionSelected(e.target.value as string)}
           disableUnderline
+          data-testid="select-field"
         >
           {Object.keys(options).map((value, index) => (
             <MenuItem key={index} value={value}>
