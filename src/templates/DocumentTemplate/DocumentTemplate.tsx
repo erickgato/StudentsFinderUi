@@ -1,10 +1,10 @@
 import React from 'react'
+import { Container } from '@material-ui/core'
 import { DocumentTemplateProps } from './DocumentTemplate.interface'
-import { Container } from './styles';
 
 export function DocumentTemplate({ children }: DocumentTemplateProps): JSX.Element {
 	return (
-		<Container>
+		<Container maxWidth="xl">
 			{children}
 		</Container>
 	)

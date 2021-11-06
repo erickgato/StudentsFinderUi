@@ -1,20 +1,14 @@
 import React from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useQuery, gql, useLazyQuery } from "@apollo/client";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { gql, useLazyQuery } from "@apollo/client";
 import { Box } from "@mui/system";
 import {
-  CircularProgress,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
   Typography,
 } from "@material-ui/core";
-import { useDebounce } from "../../hooks/useDebounce";
 import { GridLoadingSkeleton } from "../../components/organisms";
+import { MultiSearchBar } from '../../components/molecules/MultiSearchBar';
 
-type SearchField = "document" | "name" | "email";
-
+type SearchField = "document" | "name" | "email"
 export function Dashboard(): JSX.Element {
   const [searchValue, setSearchValue] = React.useState("");
   const [searchField, setSearchField] = React.useState<SearchField>("name");
@@ -28,18 +22,15 @@ export function Dashboard(): JSX.Element {
       }
     }
   `);
-  React.useEffect(() => {
-    getStudents();
-  }, []);
-  const searchStudents = useDebounce(getStudents, 500);
 
+  React.useEffect(getStudents, [getStudents]);
   React.useEffect(() => {
-    searchStudents({
+    getStudents({
       variables: {
         [searchField as string]: searchValue,
       },
     });
-  }, [searchField, searchValue]);
+  }, [searchField, searchValue, getStudents]);
 
   const columns: GridColDef[] = [
     {
@@ -48,6 +39,9 @@ export function Dashboard(): JSX.Element {
       flex: 1,
       headerAlign: "center",
       align: "center",
+      renderCell(params: GridRenderCellParams) {
+        return <Box data-testid={`names-${params.id}`}>{params.getValue(params.id, 'name')}</Box>
+      }
     },
     {
       field: "email",
@@ -55,6 +49,9 @@ export function Dashboard(): JSX.Element {
       flex: 1,
       headerAlign: "center",
       align: "center",
+      renderCell(params: GridRenderCellParams) {
+        return <Box data-testid={`emails-${params.id}`}>{params.getValue(params.id, 'email')}</Box>
+      }
     },
     {
       field: "document",
@@ -62,46 +59,41 @@ export function Dashboard(): JSX.Element {
       flex: 1,
       headerAlign: "center",
       align: "center",
+      renderCell(params: GridRenderCellParams) {
+        return <Box data-testid={`documents-${params.id}`}>{params.getValue(params.id, 'document')}</Box>
+      }
     },
   ];
 
   return (
-    <Box
-      display="flex"
-      sx={{ width: "100%", height: "100%" }}
-      flexDirection="column"
-      alignItems="center"
-      p={1}
-    >
-      <Box pl={2} pt={2}>
-        <Typography variant="h6">Alunos</Typography>
-      </Box>
-      <Box display="flex" alignItems="center" pb={4}>
-        <TextField
-          label="Buscar"
-          variant="outlined"
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-
-        <Box pl={2}>
-          <InputLabel id="search-field">Campo</InputLabel>
-          <Select
-            labelId="search-field"
-            value={searchField}
-            onChange={(e) => setSearchField(e?.target?.value as SearchField)}
-          >
-            <MenuItem value={"name"}>Nome</MenuItem>
-            <MenuItem value={"document"}>Documento</MenuItem>
-            <MenuItem value={"email"}>Email</MenuItem>
-          </Select>
+    <>
+      <Box sx={{ width: '100%' }}>
+        <Box py={3}>
+          <Typography variant="h4" color="textSecondary">Alunos</Typography>
+        </Box>
+        <Box pb={4}>
+          <MultiSearchBar  
+            width={'20rem'}
+            selectedOption={searchField}
+            placeholder='Buque aqui'
+            options={{
+              name: 'Nome',
+              document: 'Documento',
+              email: 'Email'
+            }}
+            onOptionSelected={(option) => setSearchField(option as SearchField)}
+            onValueDebounced={(text) => setSearchValue(text)}
+          />
         </Box>
       </Box>
 
-      {loading ? (
-        <GridLoadingSkeleton rowCount={3} />
-      ) : (
-        <DataGrid rows={data?.students || []} columns={columns} />
-      )}
-    </Box>
+      <Box height={'70vh'}>
+        {loading ? (
+          <GridLoadingSkeleton rowCount={3} />
+        ) : (
+          <DataGrid rows={data?.students || []} columns={columns} />
+        )}
+      </Box>
+    </>
   );
 }

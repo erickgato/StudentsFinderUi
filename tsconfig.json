@@ -20,6 +20,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "experimentalDecorators": true,
+    "types": [
+      "cypress",
+      "@testing-library/cypress"
+    ]
   },
   "include": [
     "src"
