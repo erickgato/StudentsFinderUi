@@ -10,3 +10,9 @@ Para rodar o projeto local o docker é necessário.
 2. Execute: `docker-compose up`
 
 A aplicação irá iniciar na porta 3000 do ambiente local.
+
+
+### Testes Automatizados
+O projeto utiliza o cypress para seus testes automatizados.
+
+1. ```npm run test:browser ```
